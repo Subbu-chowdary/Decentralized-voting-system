@@ -15,7 +15,9 @@
     "react-router-dom": "^6.2.1",
     "react-scripts": "4.0.3",
     "react-toastify": "^8.1.1",
-    "toastify": "^2.0.1"
+    "toastify": "^2.0.1",
+    "react-icons": "^4.3.1"
+
   },
   "scripts": {
     "start": "export NODE_OPTIONS=--openssl-legacy-provider && craco start",
