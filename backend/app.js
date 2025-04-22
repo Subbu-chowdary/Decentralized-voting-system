@@ -1,3 +1,57 @@
+// const express = require('express');
+// const app = express();
+// const cors = require('cors');
+// const cookieParser = require('cookie-parser');
+// const path = require('path');
+
+// const errorMiddleware = require('./middlewares/error');
+
+// app.use(
+//    cors({
+//       origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+//       credentials: true,
+//    })
+// );
+// app.use(function (req, res, next) {
+//    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+//    res.header('Access-Control-Allow-Headers', true);
+//    res.header('Access-Control-Allow-Credentials', true);
+//    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+//    next();
+// });
+// app.use(express.json()); //instead of body-parser
+// app.use(cookieParser());
+// console.log(process.env.NODE_ENV);
+// //document uplaod
+// const upload = require('./middlewares/upload');
+// const catchAsyncError = require('./middlewares/catchAsyncErrors');
+
+// app.post(
+//    '/api/upload',
+//    upload.single('image'),
+//    catchAsyncError(async (req, res, next) => {
+//       res.json({ file: req.file.path });
+//    })
+// );
+
+// //Importing routes
+// const users = require('./routes/user');
+// const routes = require('./routes/election');
+
+// app.use('/api/election', users);
+// app.use('/api/election', routes);
+
+// if (process.env.NODE_ENV == 'production') {
+//    app.use(express.static(path.join(__dirname, '../frontend/build'))) /
+//       app.get('*', (req, res) =>
+//          res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'))
+//       );
+// }
+
+// //Middleware to handle errors
+// app.use(errorMiddleware);
+
+// module.exports = app;
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -6,23 +60,26 @@ const path = require('path');
 
 const errorMiddleware = require('./middlewares/error');
 
+// CORS configuration: Allow frontend origin (update with Render frontend URL in production)
 app.use(
    cors({
-      origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+      origin: [
+         process.env.NODE_ENV === 'production'
+            ? 'https://decentralized-voting-system-frontend.vercel.app' // Replace with your Render frontend URL
+            : 'http://localhost:3000',
+      ],
       credentials: true,
    })
 );
-app.use(function (req, res, next) {
-   res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-   res.header('Access-Control-Allow-Headers', true);
-   res.header('Access-Control-Allow-Credentials', true);
-   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-   next();
-});
-app.use(express.json()); //instead of body-parser
+
+// Parse JSON bodies and cookies
+app.use(express.json()); // Replaces body-parser
 app.use(cookieParser());
-console.log(process.env.NODE_ENV);
-//document uplaod
+
+// Log environment for debugging
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+
+// File upload middleware
 const upload = require('./middlewares/upload');
 const catchAsyncError = require('./middlewares/catchAsyncErrors');
 
@@ -34,21 +91,23 @@ app.post(
    })
 );
 
-//Importing routes
+// Import routes
 const users = require('./routes/user');
-const routes = require('./routes/election');
+const election = require('./routes/election');
 
+// Use routes
 app.use('/api/election', users);
-app.use('/api/election', routes);
+app.use('/api/election', election);
 
-if (process.env.NODE_ENV == 'production') {
-   app.use(express.static(path.join(__dirname, '../frontend/build'))) /
-      app.get('*', (req, res) =>
-         res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'))
-      );
+// Serve frontend static files in production
+if (process.env.NODE_ENV === 'production') {
+   app.use(express.static(path.join(__dirname, '../frontend/build')));
+   app.get('*', (req, res) =>
+      res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'))
+   );
 }
 
-//Middleware to handle errors
+// Error handling middleware
 app.use(errorMiddleware);
 
 module.exports = app;
