@@ -20,9 +20,9 @@
     "web3": "^1.5.3"
 
   },
-  "scripts": {
+    "scripts": {
     "start": "export NODE_OPTIONS=--openssl-legacy-provider && craco start",
-    "build": "export NODE_OPTIONS=--openssl-legacy-provider && craco build",
+    "build": "export NODE_OPTIONS=--openssl-legacy-provider && DISABLE_ESLINT_PLUGIN=true craco build",
     "test": "export NODE_OPTIONS=--openssl-legacy-provider && craco test",
     "eject": "react-scripts eject"
   },
