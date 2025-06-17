@@ -17,13 +17,13 @@ dotenv.config({ path: "backend/config/config.env" });
 // Connecting to database
 connectDB();
 
-// Serve frontend static files
-app.use(express.static(path.join(__dirname, "../frontend/build")));
+// // Serve frontend static files
+// app.use(express.static(path.join(__dirname, "../frontend/build")));
 
-// Handle all non-API routes with React’s index.html (for React Router)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
-});
+// // Handle all non-API routes with React’s index.html (for React Router)
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
+// });
 
 // Start server with Render-compatible port binding
 const server = app.listen(process.env.PORT, "0.0.0.0", () => {
