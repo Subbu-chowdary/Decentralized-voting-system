@@ -80,7 +80,7 @@ const app = express();
 
 // Configure CORS
 const allowedOrigins = [
-  "https://inspiring-cheesecake-c4d739.netlify.app",
+  "https://voting-frontend.netlify.app",
   "http://localhost:3000", // For local development
 ];
 
