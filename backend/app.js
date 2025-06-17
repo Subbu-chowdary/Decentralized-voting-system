@@ -60,16 +60,27 @@ const path = require('path');
 
 const errorMiddleware = require('./middlewares/error');
 
-// CORS configuration: Allow frontend origin (update with Render frontend URL in production)
+// CORS configuration: Allow frontend origins
+const allowedOrigins = [
+  'http://localhost:3000', // Development
+  'http://127.0.0.1:3000', // Development
+  'https://clever-tarsier-003384.netlify.app', // Production (Netlify frontend)
+];
+
 app.use(
-   cors({
-      origin: [
-         process.env.NODE_ENV === 'production'
-            ? 'https://decentralized-voting-system-frontend.vercel.app' // Replace with your Render frontend URL
-            : 'http://localhost:3000',
-      ],
-      credentials: true,
-   })
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g., Postman) or allowed origins
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true, // Support cookies/auth
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // Allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  })
 );
 
 // Parse JSON bodies and cookies
@@ -84,11 +95,11 @@ const upload = require('./middlewares/upload');
 const catchAsyncError = require('./middlewares/catchAsyncErrors');
 
 app.post(
-   '/api/upload',
-   upload.single('image'),
-   catchAsyncError(async (req, res, next) => {
-      res.json({ file: req.file.path });
-   })
+  '/api/upload',
+  upload.single('image'),
+  catchAsyncError(async (req, res, next) => {
+    res.json({ file: req.file.path });
+  })
 );
 
 // Import routes
@@ -101,10 +112,10 @@ app.use('/api/election', election);
 
 // Serve frontend static files in production
 if (process.env.NODE_ENV === 'production') {
-   app.use(express.static(path.join(__dirname, '../frontend/build')));
-   app.get('*', (req, res) =>
-      res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'))
-   );
+  app.use(express.static(path.join(__dirname, '../frontend/build')));
+  app.get('*', (req, res) =>
+    res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'))
+  );
 }
 
 // Error handling middleware
