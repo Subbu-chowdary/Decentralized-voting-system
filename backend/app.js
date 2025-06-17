@@ -73,11 +73,7 @@ const errorMiddleware = require('./middlewares/error');
 //     allowedHeaders: ['Content-Type', 'Authorization'],
 //   })
 // );
-const express = require("express");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const app = express();
-
+?
 // Configure CORS
 const allowedOrigins = [
   "https://voting-frontend.netlify.app",
