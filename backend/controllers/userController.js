@@ -45,56 +45,101 @@ exports.getUser = catchAsyncError(async (req, res, next) => {
 //Access -> Everyone
 //Route -> /api/election/generateOtp
 //Description -> Generating Otp to login
+// exports.generateOTP = catchAsyncError(async (req, res, next) => {
+//    const { email } = req.body;
+//    if (!email) {
+//       res.status(200).json({
+//          success: false,
+//          message: `no email provided`,
+//       });
+//    }
+
+//    //Finding user
+//    const user = await User.findOne({ email });
+
+//    if (!user) {
+//       return next(new ErrorHandler('Invalid Email', 404));
+//    }
+
+//    //Generating Otp
+//    const otp = user.getOtp();
+
+//    //saving otp in user
+//    await user.save({ validateBeforeSave: false });
+
+//    //Sending otp email
+//    const message = `Your otp to login is ${otp}. It will expire in 5 minutes`;
+//    try {
+//       if (process.env.NODE_ENV == 'production') {
+//          await sendEmailProd({
+//             to: user.email,
+//             subject: 'New Otp',
+//             html: `<p>${message}</p>`,
+//          });
+//       } else {
+//          await sendEmail({
+//             email: user.email,
+//             subject: 'New Otp',
+//             message,
+//          });
+//       }
+
+//       res.status(200).json({
+//          success: true,
+//          message: `Email sent to ${user.email}`,
+//       });
+//    } catch (error) {
+//       user.otp = undefined;
+//       user.otpExpire = undefined;
+//       await user.save({ validateBeforeSave: false });
+
+//       return next(new ErrorHandler('Internal Server Error', 500));
+//    }
+// });
 exports.generateOTP = catchAsyncError(async (req, res, next) => {
-   const { email } = req.body;
-   if (!email) {
-      res.status(200).json({
-         success: false,
-         message: `no email provided`,
+  const { email } = req.body;
+  if (!email) {
+    return next(new ErrorHandler("No email provided", 400));
+  }
+
+  console.log("Finding user with email:", email);
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new ErrorHandler("Invalid Email", 404));
+  }
+
+  const otp = user.getOtp();
+  console.log("Saving user with OTP for email:", email);
+  await user.save({ validateBeforeSave: false });
+
+  const message = `Your otp to login is ${otp}. It will expire in 5 minutes`;
+  try {
+    if (process.env.NODE_ENV === "production") {
+      console.log("Sending email via sendEmailProd to:", user.email);
+      await sendEmailProd({
+        to: user.email,
+        subject: "New Otp",
+        html: `<p>${message}</p>`,
       });
-   }
-
-   //Finding user
-   const user = await User.findOne({ email });
-
-   if (!user) {
-      return next(new ErrorHandler('Invalid Email', 404));
-   }
-
-   //Generating Otp
-   const otp = user.getOtp();
-
-   //saving otp in user
-   await user.save({ validateBeforeSave: false });
-
-   //Sending otp email
-   const message = `Your otp to login is ${otp}. It will expire in 5 minutes`;
-   try {
-      if (process.env.NODE_ENV == 'production') {
-         await sendEmailProd({
-            to: user.email,
-            subject: 'New Otp',
-            html: `<p>${message}</p>`,
-         });
-      } else {
-         await sendEmail({
-            email: user.email,
-            subject: 'New Otp',
-            message,
-         });
-      }
-
-      res.status(200).json({
-         success: true,
-         message: `Email sent to ${user.email}`,
+    } else {
+      console.log("Sending email via sendEmail to:", user.email);
+      await sendEmail({
+        email: user.email,
+        subject: "New Otp",
+        message,
       });
-   } catch (error) {
-      user.otp = undefined;
-      user.otpExpire = undefined;
-      await user.save({ validateBeforeSave: false });
-
-      return next(new ErrorHandler('Internal Server Error', 500));
-   }
+    }
+    res.status(200).json({
+      success: true,
+      message: `Email sent to ${user.email}`,
+    });
+  } catch (error) {
+    console.error("Error sending OTP email:", error.message, error.stack);
+    user.otp = undefined;
+    user.otpExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorHandler(`Failed to send OTP: ${error.message}`, 500));
+  }
 });
 
 //Login a user
