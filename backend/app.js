@@ -61,27 +61,23 @@ const path = require('path');
 const errorMiddleware = require('./middlewares/error');
 
 // CORS configuration: Allow frontend origins
-const allowedOrigins = [
-  'http://localhost:3000', // Development
-  'http://127.0.0.1:3000', // Development
-  'https://clever-tarsier-003384.netlify.app', // Production (Netlify frontend)
-];
+app.options('*', cors()); // Handle preflight requests globally
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (e.g., Postman) or allowed origins
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
       }
     },
-    credentials: true, // Support cookies/auth
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // Allowed methods
-    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+
 
 // Parse JSON bodies and cookies
 app.use(express.json()); // Replaces body-parser
