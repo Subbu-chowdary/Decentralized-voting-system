@@ -97,6 +97,10 @@ app.post(
     res.json({ file: req.file.path });
   })
 );
+app.get('/', (req, res) => {
+  res.send('API is running 🚀');
+});
+
 
 // Import routes
 const users = require('./routes/user');
