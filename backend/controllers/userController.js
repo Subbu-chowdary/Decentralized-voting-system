@@ -229,56 +229,108 @@ const crypto = require("crypto");
 // Access -> Everyone
 // Route -> /api/election/generateOtp
 // Description -> Generating Otp to login
+// exports.generateOTP = catchAsyncError(async (req, res, next) => {
+//   const { email } = req.body;
+//   if (!email) {
+//     return next(new ErrorHandler("No email provided", 400));
+//   }
+
+//   // Finding user
+//   console.log("Finding user with email:", email);
+//   const user = await User.findOne({ email });
+//   if (!user) {
+//     return next(new ErrorHandler("Invalid Email", 404));
+//   }
+
+//   // Generating Otp
+//   const otp = user.getOtp();
+//   console.log("*** OTP GENERATED ***");
+//   console.log(`OTP for ${email}: ${otp}`);
+//   console.log("*** OTP VALID FOR 5 MINUTES ***");
+
+//   // Saving otp in user
+//   try {
+//     await user.save({ validateBeforeSave: false });
+//   } catch (error) {
+//     console.error("Error saving user:", error.message, error.stack);
+//     return next(new ErrorHandler("Failed to save OTP", 500));
+//   }
+
+//   // Bypassing email sending, OTP logged in backend
+//   console.log(`OTP for ${email} has been logged above for login. Retrieve from Render logs.`);
+//   res.status(200).json({
+//     success: true,
+//     message: `OTP generated for ${user.email}. Check Render logs for the OTP to login.`,
+//   });
+// });
+
+// // ... other controller functions (unchanged)
+// exports.registerUser = catchAsyncError(async (req, res, next) => {
+//   const { name, email, eAddress } = req.body;
+//   if (!email) {
+//     return next(new ErrorHandler("No email provided", 400));
+//   }
+
+//   const user = await User.create({
+//     name,
+//     email,
+//     eAddress,
+//   });
+//   res.status(200).json({
+//     success: true,
+//     user,
+//   });
+// });
 exports.generateOTP = catchAsyncError(async (req, res, next) => {
   const { email } = req.body;
-  if (!email) {
-    return next(new ErrorHandler("No email provided", 400));
+  console.log("Generate OTP request received:", { email });
+
+  // Validate email
+  if (!email || typeof email !== "string" || email.trim().length === 0) {
+    console.log("Invalid email input:", email);
+    return next(new ErrorHandler("No email provided or invalid format", 400));
   }
 
-  // Finding user
+  // Find user
   console.log("Finding user with email:", email);
-  const user = await User.findOne({ email });
+  let user;
+  try {
+    user = await User.findOne({ email });
+  } catch (error) {
+    console.error("Database error finding user:", error.message, error.stack);
+    return next(new ErrorHandler("Database error finding user", 500));
+  }
   if (!user) {
+    console.log("User not found for email:", email);
     return next(new ErrorHandler("Invalid Email", 404));
   }
 
-  // Generating Otp
-  const otp = user.getOtp();
-  console.log("*** OTP GENERATED ***");
-  console.log(`OTP for ${email}: ${otp}`);
-  console.log("*** OTP VALID FOR 5 MINUTES ***");
-
-  // Saving otp in user
+  // Generate OTP
+  let otp;
   try {
-    await user.save({ validateBeforeSave: false });
+    otp = user.getOtp();
+    console.log("*** OTP GENERATED ***");
+    console.log(`OTP for ${email}: ${otp}`);
+    console.log("*** OTP VALID FOR 5 MINUTES ***");
   } catch (error) {
-    console.error("Error saving user:", error.message, error.stack);
-    return next(new ErrorHandler("Failed to save OTP", 500));
+    console.error("Error generating OTP:", error.message, error.stack);
+    return next(new ErrorHandler("Failed to generate OTP", 500));
   }
 
-  // Bypassing email sending, OTP logged in backend
+  // Save OTP
+  try {
+    await user.save({ validateBeforeSave: false });
+    console.log(`OTP saved for ${email}`);
+  } catch (error) {
+    console.error("Error saving user with OTP:", error.message, error.stack);
+    return next(new ErrorHandler("Failed to save OTP to database", 500));
+  }
+
+  // Log success
   console.log(`OTP for ${email} has been logged above for login. Retrieve from Render logs.`);
   res.status(200).json({
     success: true,
     message: `OTP generated for ${user.email}. Check Render logs for the OTP to login.`,
-  });
-});
-
-// ... other controller functions (unchanged)
-exports.registerUser = catchAsyncError(async (req, res, next) => {
-  const { name, email, eAddress } = req.body;
-  if (!email) {
-    return next(new ErrorHandler("No email provided", 400));
-  }
-
-  const user = await User.create({
-    name,
-    email,
-    eAddress,
-  });
-  res.status(200).json({
-    success: true,
-    user,
   });
 });
 
