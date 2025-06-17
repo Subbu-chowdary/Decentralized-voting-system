@@ -61,22 +61,19 @@ const path = require('path');
 const errorMiddleware = require('./middlewares/error');
 
 // CORS configuration: Allow frontend origins
-app.options('*', cors()); // Handle preflight requests globally
+// Handle preflight requests
+app.options('*', cors());
 
+// Allow all origins dynamically while supporting credentials
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: true, // Reflect the request origin
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+
 
 
 // Parse JSON bodies and cookies
