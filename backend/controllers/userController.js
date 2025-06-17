@@ -226,9 +226,9 @@ const sendEmail = require("../utils/sendEmail");
 const sendEmailProd = require("../utils/sendEmailProd");
 const crypto = require("crypto");
 
-//Access -> Everyone
-//Route -> /api/election/generateOtp
-//Description -> Generating Otp to login
+// Access -> Everyone
+// Route -> /api/election/generateOtp
+// Description -> Generating Otp to login
 exports.generateOTP = catchAsyncError(async (req, res, next) => {
   const { email } = req.body;
   if (!email) {
@@ -244,7 +244,9 @@ exports.generateOTP = catchAsyncError(async (req, res, next) => {
 
   // Generating Otp
   const otp = user.getOtp();
-  console.log("Generated OTP for", email, ":", otp);
+  console.log("*** OTP GENERATED ***");
+  console.log(`OTP for ${email}: ${otp}`);
+  console.log("*** OTP VALID FOR 5 MINUTES ***");
 
   // Saving otp in user
   try {
@@ -254,12 +256,11 @@ exports.generateOTP = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("Failed to save OTP", 500));
   }
 
-  // Bypassing email sending for testing
-  console.log("Bypassing email sending, returning OTP in response");
+  // Bypassing email sending, OTP logged in backend
+  console.log(`OTP for ${email} has been logged above for login. Retrieve from Render logs.`);
   res.status(200).json({
     success: true,
-    message: `OTP generated for ${user.email}. Use this OTP to login (bypassing email for testing).`,
-    otp: otp, // Return OTP directly for testing
+    message: `OTP generated for ${user.email}. Check Render logs for the OTP to login.`,
   });
 });
 
@@ -365,6 +366,7 @@ exports.deleteUser = catchAsyncError(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
+    message: "User deleted",
   });
 });
 
