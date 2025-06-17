@@ -91,7 +91,7 @@ exports.generateOTP = catchAsyncError(async (req, res, next) => {
    } catch (error) {
       user.otp = undefined;
       user.otpExpire = undefined;
-      await user.save({ validateBeforeSave: fasle });
+      await user.save({ validateBeforeSave: false });
 
       return next(new ErrorHandler('Internal Server Error', 500));
    }
