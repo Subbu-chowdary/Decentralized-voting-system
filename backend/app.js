@@ -13,7 +13,7 @@ app.use(
    })
 );
 app.use(function (req, res, next) {
-   res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+   res.header('Access-Control-Allow-Origin', 'http://localhost:3000','https://voting-frontend.netlify.app');
    res.header('Access-Control-Allow-Headers', true);
    res.header('Access-Control-Allow-Credentials', true);
    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -41,12 +41,12 @@ const routes = require('./routes/election');
 app.use('/api/election', users);
 app.use('/api/election', routes);
 
-if (process.env.NODE_ENV == 'production') {
-   app.use(express.static(path.join(__dirname, '../frontend/build'))) /
-      app.get('*', (req, res) =>
-         res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'))
-      );
-}
+// if (process.env.NODE_ENV == 'production') {
+//    app.use(express.static(path.join(__dirname, '../frontend/build'))) /
+//       app.get('*', (req, res) =>
+//          res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'))
+//       );
+// }
 
 //Middleware to handle errors
 app.use(errorMiddleware);
