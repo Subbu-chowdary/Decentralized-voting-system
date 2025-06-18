@@ -60,27 +60,31 @@ const path = require('path');
 
 const errorMiddleware = require('./middlewares/error');
 
-// CORS configuration: Allow frontend origins
-app.options('*', cors()); // Handle preflight requests globally
+// Define allowed origins
+const allowedOrigins = [
+  'https://voting-frontend.netlify.app', // Frontend origin
+  'http://localhost:3000', // For local development (adjust port as needed)
+];
 
+// CORS configuration
 app.use(
   cors({
     origin: (origin, callback) => {
+      // Allow requests with no origin (e.g., Postman, curl) or allowed origins
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(new Error(`CORS policy: Origin ${origin} not allowed`));
       }
     },
-    credentials: true,
+    credentials: true, // Allow cookies/auth headers
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
-
 // Parse JSON bodies and cookies
-app.use(express.json()); // Replaces body-parser
+app.use(express.json());
 app.use(cookieParser());
 
 // Log environment for debugging
@@ -97,10 +101,11 @@ app.post(
     res.json({ file: req.file.path });
   })
 );
+
+// Root route
 app.get('/', (req, res) => {
   res.send('API is running 🚀');
 });
-
 
 // Import routes
 const users = require('./routes/user');
@@ -110,7 +115,7 @@ const election = require('./routes/election');
 app.use('/api/election', users);
 app.use('/api/election', election);
 
-// // Serve frontend static files in production
+// // Serve frontend static files in production (uncomment if needed)
 // if (process.env.NODE_ENV === 'production') {
 //   app.use(express.static(path.join(__dirname, '../frontend/build')));
 //   app.get('*', (req, res) =>
