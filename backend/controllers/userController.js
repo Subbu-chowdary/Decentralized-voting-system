@@ -440,13 +440,13 @@
 //   });
 // });
 
-const User = require("./models/user");
+const User = require("../models/user");
 
-const ErrorHandler = require("./utils/errorHandler");
-const catchAsyncError = require("./middlewares/catchAsyncErrors");
-const sendToken = require("./utils/jwtToken");
-const sendEmail = require("./utils/sendEmail");
-const sendEmailProd = require("./utils/sendEmailProd");
+const ErrorHandler = require("../utils/errorHandler");
+const catchAsyncError = require("../middlewares/catchAsyncErrors");
+const sendToken = require("../utils/jwtToken");
+const sendEmail = require("../utils/sendEmail");
+const sendEmailProd = require("../utils/sendEmailProd");
 const crypto = require("crypto");
 const { send } = require("process");
 
