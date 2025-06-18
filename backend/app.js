@@ -52,7 +52,7 @@
 // app.use(errorMiddleware);
 
 // module.exports = app;
-const User = require("../models/user");
+const User = require("./models/user");
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncError = require("../middlewares/catchAsyncErrors");
 const sendToken = require("../utils/jwtToken");
