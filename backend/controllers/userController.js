@@ -331,6 +331,35 @@ exports.generateOTP = catchAsyncError(async (req, res, next) => {
 //Login a user
 //Access -> everyone
 // api/election/login
+// exports.loginUser = catchAsyncError(async (req, res, next) => {
+//   const { email, otp } = req.body;
+
+//   if (!email || !otp) {
+//     return next(new ErrorHandler("Please enter email and otp"));
+//   }
+
+//   //finding user in database
+//   const user = await User.findOne({
+//     email,
+//     otpExpire: { $gt: Date.now() },
+//   }).select("+otp");
+
+//   //console.log(user);
+//   // console.log(user.createdAt + "      " + user.otpExpire);
+//   if (!user) {
+//     return next(
+//       new ErrorHandler("Otp is invalid or expired or email id is wrong", 400)
+//     );
+//   }
+
+//   //checking otp is correct or not
+//   const isOtpMatched = await user.compareOtp(otp);
+//   if (!isOtpMatched) {
+//     return next(new ErrorHandler("Invalid Email or otp", 401));
+//   }
+//   user.otp = null;
+//   sendToken(user, 200, res);
+// });
 exports.loginUser = catchAsyncError(async (req, res, next) => {
   const { email, otp } = req.body;
 
@@ -344,8 +373,6 @@ exports.loginUser = catchAsyncError(async (req, res, next) => {
     otpExpire: { $gt: Date.now() },
   }).select("+otp");
 
-  //console.log(user);
-  // console.log(user.createdAt + "      " + user.otpExpire);
   if (!user) {
     return next(
       new ErrorHandler("Otp is invalid or expired or email id is wrong", 400)
@@ -360,6 +387,7 @@ exports.loginUser = catchAsyncError(async (req, res, next) => {
   user.otp = null;
   sendToken(user, 200, res);
 });
+
 
 //Logout a user
 //Access -> allusers
