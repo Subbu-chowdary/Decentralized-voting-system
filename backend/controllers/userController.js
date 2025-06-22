@@ -266,58 +266,6 @@ exports.getUser = catchAsyncError(async (req, res, next) => {
 //Access -> Everyone
 //Route -> /api/election/generateOtp
 //Description -> Generating Otp to login
-// exports.generateOTP = catchAsyncError(async (req, res, next) => {
-//   const { email } = req.body;
-//   if (!email) {
-//     res.status(200).json({
-//       success: false,
-//       message: `no email provided`,
-//     });
-//   }
-
-//   //Finding user
-//   const user = await User.findOne({ email });
-
-//   if (!user) {
-//     return next(new ErrorHandler("Invalid Email", 404));
-//   }
-
-//   //Generating Otp
-//   const otp = user.getOtp();
-
-//   //saving otp in user
-//   await user.save({ validateBeforeSave: false });
-
-//   //Sending otp email
-//   const message = `Your otp to login is ${otp}. It will expire in 5 minutes`;
-//   try {
-//     if (process.env.NODE_ENV == "production") {
-//       await sendEmailProd({
-//         to: user.email,
-//         subject: "New Otp",
-//         html: `<p>${message}</p>`,
-//       });
-//     } else {
-//       await sendEmail({
-//         email: user.email,
-//         subject: "New Otp",
-//         message,
-//       });
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       message: `Email sent to ${user.email}`,
-//     });
-//   } catch (error) {
-//     user.otp = undefined;
-//     user.otpExpire = undefined;
-//     await user.save({ validateBeforeSave: false });
-
-//     return next(new ErrorHandler("Internal Server Error", 500));
-//   }
-// });
-
 exports.generateOTP = catchAsyncError(async (req, res, next) => {
   const { email } = req.body;
   console.log("Generate OTP request received:", { email });
