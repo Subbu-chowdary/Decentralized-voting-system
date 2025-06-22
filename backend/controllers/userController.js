@@ -364,30 +364,31 @@ exports.loginUser = catchAsyncError(async (req, res, next) => {
   const { email, otp } = req.body;
 
   if (!email || !otp) {
-    return next(new ErrorHandler("Please enter email and otp"));
+    return next(new ErrorHandler("Please enter email and OTP", 400));
   }
 
-  //finding user in database
+  // Find user in database
   const user = await User.findOne({
     email,
     otpExpire: { $gt: Date.now() },
   }).select("+otp");
 
   if (!user) {
-    return next(
-      new ErrorHandler("Otp is invalid or expired or email id is wrong", 400)
-    );
+    return next(new ErrorHandler("OTP is invalid, expired, or email is wrong", 400));
   }
 
-  //checking otp is correct or not
+  // Check OTP
   const isOtpMatched = await user.compareOtp(otp);
   if (!isOtpMatched) {
-    return next(new ErrorHandler("Invalid Email or otp", 401));
+    return next(new ErrorHandler("Invalid email or OTP", 401));
   }
+
+  // Clear OTP
   user.otp = null;
+  await user.save({ validateBeforeSave: false });
+
   sendToken(user, 200, res);
 });
-
 
 //Logout a user
 //Access -> allusers
