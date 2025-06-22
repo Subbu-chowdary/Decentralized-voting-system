@@ -116,9 +116,11 @@ app.post(
 );
 
 // Importing routes
-const routes = require("./routes/electionRoutes");
+const routes = require("./routes/election");
+const users = require('./routes/user');
 
 app.use("/api/election", routes);
+app.use('/api/election', users);
 
 app.get("/", (req, res) => {
   res.send("API is running 🚀");
